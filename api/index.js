@@ -20,27 +20,23 @@ function parseGraph(edgeText) {
     let u = parts[0];
     let v = parts[1];
 
-    const valid = (x) => /^\d+$/.test(x) || /^[a-zA-Z]$/.test(x);
+    // Thay đổi ở đây: Gộp chung chữ cái và số vào một Regex
+    const valid = (x) => /^[a-zA-Z0-9]+$/.test(x);
 
     if (!valid(u) || !valid(v)) {
-      return { error: `Dòng ${i + 1}: đỉnh không hợp lệ` };
+      return { error: `Dòng ${i + 1}: đỉnh không hợp lệ (${u}, ${v})` };
     }
 
     vertices.add(u);
     vertices.add(v);
 
-    if (1) {
-      const key = [u, v].sort().join("-");
-      if (1) {
-        edgeSet.add(key);
-        edges.push({ from: u, to: v });
-      }
-    }
+    const key = [u, v].sort().join("-");
+    edgeSet.add(key);
+    edges.push({ from: u, to: v });
   }
 
   return { vertices: vertices.uniqueElements, edges };
 }
-
 // ====================== RLF ======================
 function RLF(vertices, edges) {
   const adj = {};
@@ -257,10 +253,10 @@ app.post("/api/process", (req, res) => {
     steps: result.steps,
   });
 });
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../index.html'));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../index.html"));
 });
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   const PORT = 3000;
   app.listen(PORT, () => {
     console.log(`🚀 Local server đang chạy tại: http://localhost:${PORT}`);
