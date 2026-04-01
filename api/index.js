@@ -257,11 +257,14 @@ app.post("/api/process", (req, res) => {
     steps: result.steps,
   });
 });
-
-if (process.env.NODE_ENV !== "production") {
-  app.listen(3000, () =>
-    console.log("🚀 Server đang chạy tại http://localhost:3000"),
-  );
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../index.html'));
+});
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = 3000;
+  app.listen(PORT, () => {
+    console.log(`🚀 Local server đang chạy tại: http://localhost:${PORT}`);
+  });
 }
 
 module.exports = app;
