@@ -1,4 +1,4 @@
-const Multiset = require("./lib/multiset.js");
+const Multiset = require("../lib/multiset.js");
 const express = require("express");
 const path = require("path");
 const app = express();
@@ -237,26 +237,6 @@ function clearGraph() {
   // reset về trạng thái ban đầu
   showExplanation();
 }
-// ====================== API ======================
-app.post("/api/process", (req, res) => {
-  const { edges, method = "welsh" } = req.body; // ✅ mặc định Welsh
-
-  const parsed = parseGraph(edges);
-  if (parsed.error) return res.json(parsed);
-
-  let result;
-
-  if (method === "dsatur") result = DSATUR(parsed.vertices, parsed.edges);
-  else if (method === "rlf") result = RLF(parsed.vertices, parsed.edges);
-  else result = WelshPowell(parsed.vertices, parsed.edges);
-
-  const final = buildResult(parsed.vertices, parsed.edges, result);
-
-  res.json({
-    ...final,
-    steps: result.steps,
-  });
-});
 
 // ====================== API ======================
 app.post("/api/process", (req, res) => {
