@@ -258,7 +258,6 @@ app.post("/api/process", (req, res) => {
   });
 });
 
-// app.listen(3000, () =>
-//   console.log("🚀 http://localhost:3000")
-// );
-module.exports = app;
+app.listen(3000, () =>
+  console.log("🚀 http://localhost:3000")
+//module.exports = app;
