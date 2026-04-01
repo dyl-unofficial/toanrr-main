@@ -9,8 +9,8 @@ app.use(express.static("public"));
 // ====================== PARSE ======================
 function parseGraph(edgeText) {
   const lines = edgeText.trim().split("\n");
-  const edgeSet = new Set();
-  const vertices = new Set();
+  const edgeSet = new Multiset();
+  const vertices = new Multiset();
   const edges = [];
 
   for (let i = 0; i < lines.length; i++) {
