@@ -1,3 +1,4 @@
+const Multiset = require('./lib/multiset.js');
 const express = require('express');
 const path = require('path');
 const app = express();
@@ -5,11 +6,11 @@ const app = express();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static('public'));
 
-// ====================== PARSE + VALIDATE ======================
+// ====================== PARSE ======================
 function parseGraph(edgeText) {
   const lines = edgeText.trim().split('\n');
-  const edgeSet = new Set();
-  const vertices = new Set();
+  const edgeSet = new Multiset();
+  const vertices = new Multiset();
   const edges = [];
 
   for (let i = 0; i < lines.length; i++) {
@@ -28,16 +29,16 @@ function parseGraph(edgeText) {
     vertices.add(u);
     vertices.add(v);
 
-    if (u !== v) {
+    if (1) {
       const key = [u, v].sort().join('-');
-      if (!edgeSet.has(key)) {
+      if (1) {
         edgeSet.add(key);
         edges.push({ from: u, to: v });
       }
     }
   }
 
-  return { vertices: Array.from(vertices), edges };
+  return { vertices: vertices.uniqueElements, edges };
 }
 
 // ====================== RLF ======================
@@ -60,7 +61,6 @@ function RLF(vertices, edges) {
     steps.push({ type: "newColor", color: colorId });
 
     while (candidates.size > 0) {
-
       let best = [...candidates].sort((a, b) => adj[b].size - adj[a].size)[0];
 
       steps.push({ type: "select", node: best });
@@ -153,7 +153,6 @@ function DSATUR(vertices, edges) {
   });
 
   while (Object.keys(color).length < vertices.length) {
-
     let candidate = null;
 
     for (let v of vertices) {
@@ -166,11 +165,7 @@ function DSATUR(vertices, edges) {
       }
     }
 
-    steps.push({
-      type: "select",
-      node: candidate,
-      saturation: saturation[candidate]
-    });
+    steps.push({ type: "select", node: candidate });
 
     let used = new Set();
     adj[candidate].forEach(n => {
@@ -182,13 +177,8 @@ function DSATUR(vertices, edges) {
 
     color[candidate] = c;
 
-    steps.push({
-      type: "color",
-      node: candidate,
-      color: c
-    });
+    steps.push({ type: "color", node: candidate, color: c });
 
-    // cập nhật saturation
     adj[candidate].forEach(n => {
       if (!color[n]) {
         const neighborColors = new Set();
@@ -196,12 +186,6 @@ function DSATUR(vertices, edges) {
           if (color[x]) neighborColors.add(color[x]);
         });
         saturation[n] = neighborColors.size;
-
-        steps.push({
-          type: "updateSat",
-          node: n,
-          value: saturation[n]
-        });
       }
     });
   }
@@ -209,13 +193,8 @@ function DSATUR(vertices, edges) {
   return { color, chromatic: Math.max(...Object.values(color)), steps };
 }
 
-// ====================== BUILD RESPONSE ======================
+// ====================== BUILD ======================
 function buildResult(vertices, edges, result) {
-  const palette = [
-    "#EF4444", "#22C55E", "#3B82F6", "#F59E0B",
-    "#A855F7", "#EC4899", "#14B8A6", "#8B5CF6"
-  ];
-
   const nodes = vertices.map(v => ({
     id: v,
     label: v,
@@ -229,54 +208,52 @@ function buildResult(vertices, edges, result) {
     groups[c].push(v);
   }
 
-  const colorGroups = Object.keys(groups).map(c => ({
-    color: c,
-    vertices: groups[c]
-  }));
-
   return {
     nodes,
     edges,
-    colorGroups,
+    colorGroups: Object.keys(groups).map(c => ({
+      color: c,
+      vertices: groups[c]
+    })),
     chromaticNumber: result.chromatic
   };
 }
 
+function clearGraph() {
+  // xoá graph
+  nodes.clear();
+  edges.clear();
+
+  // xoá input
+  document.getElementById("edges").value = "";
+
+  // xoá info + explanation (nếu muốn)
+  document.getElementById("info").innerHTML = "";
+  document.getElementById("explanation").innerHTML = "";
+
+  // reset về trạng thái ban đầu
+  showExplanation();
+}
 // ====================== API ======================
 app.post('/api/process', (req, res) => {
-  const { edges, method = 'rlf' } = req.body;
+  const { edges, method = 'welsh' } = req.body; // ✅ mặc định Welsh
 
-  // ===== PARSE =====
   const parsed = parseGraph(edges);
   if (parsed.error) return res.json(parsed);
 
   let result;
 
-  // ===== CHỌN THUẬT TOÁN =====
-  if (method === 'dsatur') {
-    result = DSATUR(parsed.vertices, parsed.edges);
-  }
-  else if (method === 'welsh') {
-    result = WelshPowell(parsed.vertices, parsed.edges);
-  }
-  else {
-    result = RLF(parsed.vertices, parsed.edges);
-  }
+  if (method === 'dsatur') result = DSATUR(parsed.vertices, parsed.edges);
+  else if (method === 'rlf') result = RLF(parsed.vertices, parsed.edges);
+  else result = WelshPowell(parsed.vertices, parsed.edges);
 
-  // ===== BUILD KẾT QUẢ =====
   const final = buildResult(parsed.vertices, parsed.edges, result);
 
-  // ===== TRẢ VỀ (CÓ STEPS) =====
   res.json({
     ...final,
     steps: result.steps
   });
 });
-
-// ======================
-app.get('/', (req, res) =>
-  res.sendFile(path.join(__dirname, 'public', 'index.html'))
-);
 
 app.listen(3000, () =>
   console.log("🚀 http://localhost:3000")
