@@ -131,18 +131,14 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 function clearGraph() {
-  // xoá graph
   nodes.clear();
   edges.clear();
 
-  // xoá input
   document.getElementById("edges").value = "";
 
-  // xoá info + explanation (nếu muốn)
   document.getElementById("info").innerHTML = "";
   document.getElementById("explanation").innerHTML = "";
   document.getElementById("colorList").innerHTML = "";
-  // reset về trạng thái ban đầu
   showExplanation();
 }
 

@@ -19,7 +19,6 @@ function parseGraph(edgeText) {
     let u = parts[0];
     let v = parts[1];
 
-    // Thay đổi ở đây: Gộp chung chữ cái và số vào một Regex
     const valid = (x) => /^[a-zA-Z0-9]+$/.test(x);
 
     if (!valid(u) || !valid(v)) {
@@ -222,18 +221,14 @@ function buildResult(vertices, edges, result) {
 }
 
 function clearGraph() {
-  // xoá graph
   nodes.clear();
   edges.clear();
 
-  // xoá input
   document.getElementById("edges").value = "";
 
-  // xoá info + explanation (nếu muốn)
   document.getElementById("info").innerHTML = "";
   document.getElementById("explanation").innerHTML = "";
 
-  // reset về trạng thái ban đầu
   showExplanation();
 }
 
