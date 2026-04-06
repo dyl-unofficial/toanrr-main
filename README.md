@@ -1,5 +1,10 @@
 # 🎨 Graph Coloring Tool - Toán Rời Rạc
 
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![HTML5 Canvas](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
+
 Đây là một dự án ứng dụng web trực quan hóa các thuật toán tô màu đồ thị (Graph Coloring), phục vụ cho môn học Toán rời rạc. Dự án mô phỏng chi tiết từng bước (step-by-step animation) cách các thuật toán hoạt động để tìm ra sắc số của đồ thị.
 
 ## 📁 Cấu trúc dự án
